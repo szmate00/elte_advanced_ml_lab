@@ -6,8 +6,8 @@ Repository for my coursework in the "[Advanced Machine Learning Lab](https://csa
 **Subject code:** dsadvmachlf20lx<br>
 **Credits:** 4<br>
 
-# Project description
-## [Hamiltonian neural networks](https://arxiv.org/abs/1906.01563)
+## Project description
+### [Hamiltonian neural networks](https://arxiv.org/abs/1906.01563)
 
 *Abstract:* Even though neural networks enjoy widespread use, they still struggle to learn the basic laws of physics. How might we endow them with better inductive biases? In this paper, we draw inspiration from Hamiltonian mechanics to train models that learn and respect exact conservation laws in an unsupervised manner. We evaluate our models on problems where conservation of energy is important, including the two-body problem and pixel observations of a pendulum. Our model trains faster and generalizes better than a regular neural network. An interesting side effect is that our model is perfectly reversible in time.
 
