@@ -5,13 +5,13 @@ import torch.nn as nn
 
 # baseline multilayer perceptron
 class MLP(nn.Module):
-    def __init__(self):
+    def __init__(self, dims):
         super(MLP, self).__init__()
-        self.model = nn.Sequential(nn.Linear(2, 200),
+        self.model = nn.Sequential(nn.Linear(2 * dims, 200),
                                   nn.Tanh(),
                                   nn.Linear(200, 200),
                                   nn.Tanh(),
-                                  nn.Linear(200, 2))    
+                                  nn.Linear(200, 2 * dims))    
         
     def forward(self, x):
         out = self.model(x)
@@ -20,16 +20,15 @@ class MLP(nn.Module):
 
 # differentiable hamiltonian neural network
 class HNN(nn.Module):
-    def __init__(self):
+    def __init__(self, dims):
         super(HNN, self).__init__()
-        self.model = nn.Sequential(nn.Linear(2, 200),
+        self.model = nn.Sequential(nn.Linear(2 * dims, 200),
                                   nn.Tanh(),
                                   nn.Linear(200, 200),
                                   nn.Tanh(),
-                                  nn.Linear(200, 1))    
+                                  nn.Linear(200, 1))
         
     def forward(self, x):
-        x = torch.autograd.Variable(x, requires_grad=True)
-        out = torch.autograd.grad(self.model(x).sum(), x, create_graph=True)[0]
+        out = self.model(x)
 
-        return out @ torch.Tensor([[0, -1],[1, 0]])
+        return out
