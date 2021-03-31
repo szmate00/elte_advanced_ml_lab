@@ -27,7 +27,7 @@ class HNN(nn.Module):
                                   nn.Linear(200, 200),
                                   nn.Tanh(),
                                   nn.Linear(200, 1))
-        
+
     def forward(self, x):
         out = self.model(x)
 
