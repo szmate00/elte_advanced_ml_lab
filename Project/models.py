@@ -45,10 +45,10 @@ class HNN(nn.Module):
     def diff_hnn(self, x):
       x = torch.autograd.Variable(x, requires_grad=True)
 
-      x_forward = self.forward(x)
-      out = torch.autograd.grad(x_forward.sum(), x, create_graph=True)[0]
+      H = self.forward(x)
+      out = torch.autograd.grad(H.sum(), x, create_graph=True)[0]
 
-      return x_forward.sum(), out @ self.M
+      return H, out @ self.M
 
 
 # simple autoencoder
@@ -69,14 +69,14 @@ class MLP_autoencoder(nn.Module):
 
     def encode(self, x):
       x = self.relu(self.fcs1(x))
-      x = x + self.relu(self.fcs2(x))
-      x = x + self.relu(self.fcs3(x))
+      x = xself.relu(self.fcs2(x))
+      x = self.relu(self.fcs3(x))
       return self.fcs4(x)
 
     def decode(self, x):
       x = self.relu(self.fcs5(x))
-      x = x + self.relu(self.fcs6(x))
-      x = x + self.relu(self.fcs7(x))
+      x = self.relu(self.fcs6(x))
+      x = self.relu(self.fcs7(x))
       return self.fcs8(x)
 
     def forward(self, x):
@@ -107,14 +107,14 @@ class PixelHNN(nn.Module):
 
   def encode(self, x):
     x = self.relu(self.fcs1(x))
-    x = x + self.relu(self.fcs2(x))
-    x = x + self.relu(self.fcs3(x))
+    x = self.relu(self.fcs2(x))
+    x = self.relu(self.fcs3(x))
     return self.fcs4(x)
 
   def decode(self, x):
     x = self.relu(self.fcs5(x))
-    x = x + self.relu(self.fcs6(x))
-    x = x + self.relu(self.fcs7(x))
+    x = self.relu(self.fcs6(x))
+    x = self.relu(self.fcs7(x))
     return self.fcs8(x)
 
   def forward(self, x):
