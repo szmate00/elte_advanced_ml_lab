@@ -30,11 +30,6 @@ class HNN(nn.Module):
 
         self.M = self.M_tensor(dims)
 
-    def forward(self, x):
-        out = self.model(x)
-        
-        return out
-
     def M_tensor(self, dims):
       if dims == 1:
         return torch.Tensor([[0, -1],[1, 0]])
@@ -42,13 +37,14 @@ class HNN(nn.Module):
       elif dims == 2:
         return torch.Tensor([[0, 0, 0, -1], [0, 0, -1, 0], [0, 1, 0, 0], [1, 0, 0, 0]])
 
-    def diff_hnn(self, x):
+    # forward pass with differentiating
+    def forward(self, x):
       x = torch.autograd.Variable(x, requires_grad=True)
-
-      H = self.forward(x)
+      H = self.model(x)
       out = torch.autograd.grad(H.sum(), x, create_graph=True)[0]
 
       return H, out @ self.M
+      
 
 
 # simple autoencoder
@@ -65,57 +61,40 @@ class MLP_autoencoder(nn.Module):
     self.fcs7 = torch.nn.Linear(200, 200)
     self.fcs8 = torch.nn.Linear(200, dims)
 
-    self.relu = nn.ReLU()
+    self.tanh = nn.Tanh()
 
-    def encode(self, x):
-      x = self.relu(self.fcs1(x))
-      x = xself.relu(self.fcs2(x))
-      x = self.relu(self.fcs3(x))
-      return self.fcs4(x)
+  def encode(self, x):
+    x = self.tanh(self.fcs1(x))
+    x = self.tanh(self.fcs2(x))
+    x = self.tanh(self.fcs3(x))
+    return self.fcs4(x)
 
-    def decode(self, x):
-      x = self.relu(self.fcs5(x))
-      x = self.relu(self.fcs6(x))
-      x = self.relu(self.fcs7(x))
-      return self.fcs8(x)
+  def decode(self, x):
+    x = self.tanh(self.fcs5(x))
+    x = self.tanh(self.fcs6(x))
+    x = self.tanh(self.fcs7(x))
+    return self.fcs8(x)
 
-    def forward(self, x):
-      latent = self.encode(x)
-      out = self.decode(latent)
-      return out
+  def forward(self, x):
+    latent = self.encode(x)
+    out = self.decode(latent)
+    return out
 
 # HNN autoencoder
 class PixelHNN(nn.Module):
   def __init__(self, dims):
     super(PixelHNN, self).__init__()
-    self.fcs1 = torch.nn.Linear(dims, 200)
-    self.fcs2 = torch.nn.Linear(200, 200)
-    self.fcs3 = torch.nn.Linear(200, 200)
-    self.fcs4 = torch.nn.Linear(200, 2)
-
-    self.fcs5 = torch.nn.Linear(2, 200)
-    self.fcs6 = torch.nn.Linear(200, 200)
-    self.fcs7 = torch.nn.Linear(200, 200)
-    self.fcs8 = torch.nn.Linear(200, dims)
-
-    self.relu = nn.ReLU()
-
+    self.autoencoder = MLP_autoencoder(dims=dims)
     self.hnn = HNN(dims=1)
 
   def model_diff(self, x):
-    return self.hnn.diff_hnn(x)[1]
+    return self.hnn.forward(x)[1]
 
   def encode(self, x):
-    x = self.relu(self.fcs1(x))
-    x = self.relu(self.fcs2(x))
-    x = self.relu(self.fcs3(x))
-    return self.fcs4(x)
+    return self.autoencoder.encode(x)
 
-  def decode(self, x):
-    x = self.relu(self.fcs5(x))
-    x = self.relu(self.fcs6(x))
-    x = self.relu(self.fcs7(x))
-    return self.fcs8(x)
+  def decode(self, latent):
+    return self.autoencoder.decode(latent)
 
   def forward(self, x):
     latent = self.encode(x)
